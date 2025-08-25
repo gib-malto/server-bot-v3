@@ -5,9 +5,9 @@ import os
 import threading
 from flask import Flask
 
-# ✅ Your bot token and chat_id
-BOT_TOKEN = "8346040048:AAEa5A3ZZ8BI4xppBEUMVNkgZn94KZJNSsk"
-CHAT_ID = "8205635617"
+# ✅ Read bot credentials from environment variables
+BOT_TOKEN = os.environ.get("BOT_TOKEN")
+CHAT_ID = os.environ.get("CHAT_ID")
 
 URL = "https://androidmultitool.com"   # Change if status page is different
 
@@ -59,7 +59,7 @@ def check_status():
     except Exception as e:
         print("Error checking server:", e)
 
-# Flask web app
+# Flask web app (for Render to detect a running service)
 app = Flask(__name__)
 
 @app.route("/")
@@ -70,9 +70,12 @@ def home():
 def run_checker():
     while True:
         check_status()
-        time.sleep(10)
+        time.sleep(10)   # adjust as needed
 
 if __name__ == "__main__":
+    # Start the monitoring loop in the background
     threading.Thread(target=run_checker, daemon=True).start()
+
+    # Run Flask app on Render-assigned port
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
