@@ -2,6 +2,8 @@ import requests
 from bs4 import BeautifulSoup
 import time
 import os
+import threading
+from flask import Flask
 
 # ✅ Your bot token and chat_id
 BOT_TOKEN = "8346040048:AAEa5A3ZZ8BI4xppBEUMVNkgZn94KZJNSsk"
@@ -11,9 +13,6 @@ URL = "https://androidmultitool.com"   # Change if status page is different
 
 # Store last status for all servers
 last_status = {}
-
-def clear_screen():
-    os.system("cls" if os.name == "nt" else "clear")
 
 def notify(msg):
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
@@ -60,8 +59,20 @@ def check_status():
     except Exception as e:
         print("Error checking server:", e)
 
-# 🔁 Loop every 10 seconds (adjust as needed)
-while True:
-    clear_screen()
-    check_status()
-    time.sleep(10)
+# Flask web app
+app = Flask(__name__)
+
+@app.route("/")
+def home():
+    return "✅ Server Monitor is running and sending Telegram alerts!"
+
+# Background thread for monitoring
+def run_checker():
+    while True:
+        check_status()
+        time.sleep(10)
+
+if __name__ == "__main__":
+    threading.Thread(target=run_checker, daemon=True).start()
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
