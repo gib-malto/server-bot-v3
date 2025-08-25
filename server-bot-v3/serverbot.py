@@ -70,7 +70,7 @@ def home():
 def run_checker():
     while True:
         check_status()
-        time.sleep(10)   # adjust as needed
+        time.sleep(3)   # adjust as needed
 
 if __name__ == "__main__":
     # Start the monitoring loop in the background
@@ -79,3 +79,4 @@ if __name__ == "__main__":
     # Run Flask app on Render-assigned port
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
